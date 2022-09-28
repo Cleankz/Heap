@@ -55,6 +55,12 @@ class Heap:
         if count_element == 1:  # если куча  состоит из одного элемента
             return -1
         result = self.HeapArray[0]
+        if result < self.HeapArray[1] and count_element == 2:
+            self.HeapArray[0], self.HeapArray[1] = self.HeapArray[1], self.HeapArray[0]
+            result = self.HeapArray[0]
+            self.HeapArray[0] = self.HeapArray[1]
+            self.HeapArray[1] = None
+
         for i in range(len(self.HeapArray)-1,0,-1):
             if self.HeapArray[i] is not None:
                 self.HeapArray[0] = self.HeapArray[i]
@@ -95,3 +101,16 @@ class Heap:
                 parent_idx = int((id_add_elem - 1) / 2)
             else:
                 break
+# a = [5, 11, 7]
+# a = [4,5]
+# #a = [4, 10, 3, 5, 1]
+# #a = [1, 3, 5, 4, 6, 13, 10, 9, 8, 15, 17]
+# #a = [11,9,4,7,8,3,1,2,5,6]
+# heap = Heap()
+# heap.MakeHeap(a, 2)
+# heap.Add(6)
+# print(heap.GetMax())
+# print(heap.GetMax())
+# print(heap.GetMax())
+# # heap.Add(12)
+# print(heap.HeapArray)
