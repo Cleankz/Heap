@@ -10,14 +10,37 @@ class Heap:
         if len(a) == 0:
             return self.HeapArray
         self.HeapArray[0] = a[0]
+        count_element  = len(a)
         for i in range(1, len(a)):  # пробегаем  по данным исходного массива начиная со второго тк первый уже вставили
             self.HeapArray[i] = a[i]
-            idx = int((i - 1) // 2)
-            for j  in range(len(self.HeapArray)): # не правильно работает!!!!!!!!!!!!
-                if self.HeapArray[j] is None:
-                    break
-                if self.HeapArray[j] > self.HeapArray[int((j - 1) / 2)]:
-                    self.HeapArray[j],self.HeapArray[int((j - 1) / 2)] = self.HeapArray[int((j - 1) / 2)],self.HeapArray[j]
+
+            idx = int((i - 1) / 2)
+            append_id = i
+
+            while idx >=0 and append_id > 0:
+                if self.HeapArray[append_id] > self.HeapArray[idx]:
+                    self.HeapArray[append_id],self.HeapArray[idx] = self.HeapArray[idx],self.HeapArray[append_id]
+                else:
+                    if 2 * append_id + 2 >= len(self.HeapArray) or 2 * append_id + 1 >= len(self.HeapArray):
+                        break
+                    if self.HeapArray[2 * append_id + 2] is  None and self.HeapArray[2 * append_id + 1] is  None:
+                        break
+                    if self.HeapArray[2 * append_id + 2] is  None and self.HeapArray[2 * append_id + 1] <= self.HeapArray[append_id]:
+                        break
+                    if self.HeapArray[2 * append_id + 1] is  None and self.HeapArray[2 * append_id+ 2] <= self.HeapArray[append_id]:
+                        break
+                    if (self.HeapArray[2 * append_id + 2] is  None or self.HeapArray[2 * append_id + 2] <= self.HeapArray[2 * append_id + 1]) and self.HeapArray[2 * append_id + 1] > self.HeapArray[append_id]:
+                        self.HeapArray[append_id],self.HeapArray[2 * append_id + 1] = self.HeapArray[2 * append_id + 1],self.HeapArray[append_id]
+                        append_id = 2 * i + 1
+                        idx = int((append_id - 1) / 2)
+                        break
+                    if ((2 * append_id + 2) <= (count_element - 2)) and (self.HeapArray[2 * append_id+ 1] is  None or (self.HeapArray[2 * append_id + 2] >= self.HeapArray[2 * append_id+ 1])) and (self.HeapArray[2 * append_id + 2] > self.HeapArray[append_id]):
+                        self.HeapArray[append_id],self.HeapArray[2 * append_id + 2] = self.HeapArray[2 * append_id + 2],self.HeapArray[append_id]
+                        append_id = 2 * i + 2
+                        idx = int((append_id - 1) / 2)
+                        break
+                append_id = idx
+                idx = int((append_id - 1) / 2)
         return self.HeapArray
 
 
@@ -37,18 +60,22 @@ class Heap:
                 self.HeapArray[0] = self.HeapArray[i]
                 self.HeapArray[i] = None
                 break
+        idx = 0
         for i in range(len(self.HeapArray)):
-            if 2 * i + 1 > i - 2 or 2 * i + 2 > i - 2:
+
+            if 2 * idx + 2 >= len(self.HeapArray) or 2 * idx + 1 >= len(self.HeapArray):
+                return result 
+            if self.HeapArray[2 * idx + 2] is  None and self.HeapArray[2 * idx + 1] is  None:
                 return result
-            if self.HeapArray[2 * i + 2] >= self.HeapArray[2 * i + 1] and self.HeapArray[2 * i + 2] > self.HeapArray[i]:
-                self.HeapArray[i],self.HeapArray[2 * i + 2] = self.HeapArray[2 * i + 2],self.HeapArray[i]
-                i = 2 * i + 2
-            if self.HeapArray[2 * i + 2] <= self.HeapArray[2 * i + 1] and self.HeapArray[2 * i + 1] > self.HeapArray[i]:
-                self.HeapArray[i],self.HeapArray[2 * i + 1] = self.HeapArray[2 * i + 1],self.HeapArray[i]
-                i = 2 * i + 1
-            if self.HeapArray[i] > self.HeapArray[2 * i + 2] and self.HeapArray[i] > self.HeapArray[2 * i + 1]:
-                break
-        
+            if 2 * idx + 1 <= count_element - 2 and self.HeapArray[2 * idx + 2] is  None or self.HeapArray[2 * idx + 2] <= self.HeapArray[2 * idx + 1] and self.HeapArray[2 * idx + 1] > self.HeapArray[idx]:
+                self.HeapArray[idx],self.HeapArray[2 * idx + 1] = self.HeapArray[2 * idx + 1],self.HeapArray[idx]
+                idx = 2 * i + 1
+                continue
+            if 2 * idx + 2 <= count_element - 2 and self.HeapArray[2 * idx + 1] is  None or self.HeapArray[2 * idx + 2] >= self.HeapArray[2 * idx + 1] and self.HeapArray[2 * idx + 2] > self.HeapArray[idx]:
+                self.HeapArray[idx],self.HeapArray[2 * idx + 2] = self.HeapArray[2 * idx + 2],self.HeapArray[idx]
+                idx = 2 * i + 2
+                continue
+
         return result
 
     def Add(self, key):# добавляем новый элемент key в кучу и перестраиваем её
@@ -59,11 +86,12 @@ class Heap:
             if i != None:
                 id_last_elem += 1
         self.HeapArray[id_last_elem] = key
+        id_add_elem = id_last_elem# индекс элемента который мы вставляем
+        parent_idx = int((id_add_elem - 1) / 2) # индекс его родителя
         for i in range(id_last_elem,-1,-1):
-            if self.HeapArray[i] > self.HeapArray[int((i - 1) / 2)]:
-                self.HeapArray[i],self.HeapArray[int((i - 1) / 2)] = self.HeapArray[int((i - 1) / 2)],self.HeapArray[i]
-                i = int((i - 1) / 2)
-a = [4, 10, 3, 5, 1]
-# a = [1, 3, 5, 4, 6, 13, 10, 9, 8, 15, 17]
-heap = Heap()
-print(heap.MakeHeap(a, 3))
+            if self.HeapArray[id_add_elem] > self.HeapArray[parent_idx]:
+                self.HeapArray[id_add_elem],self.HeapArray[parent_idx] = self.HeapArray[parent_idx],self.HeapArray[id_add_elem]
+                id_add_elem = parent_idx
+                parent_idx = int((id_add_elem - 1) / 2)
+            else:
+                break
